@@ -1,16 +1,18 @@
-use rsa::sha2::{Digest, Sha256,Sha384,Sha512};
-use rand::RngCore;
+use rsa::sha2::{Sha256,Sha384,Sha512};
 use rsa::rand_core::CryptoRngCore;
 use rsa::{PaddingScheme, PublicKey, RsaPrivateKey, RsaPublicKey};
+use rsa::pkcs1::{EncodeRsaPublicKey, LineEnding};
 use rsa::pkcs1v15::{Signature, SigningKey, VerifyingKey};
-use rsa::signature::{Keypair, RandomizedSigner, SignatureEncoding, Signer, Verifier};
+use rsa::signature::{Keypair, RandomizedSigner, SignatureEncoding, Verifier};
 
 pub struct RsaEntity<T>{
     prk:RsaPrivateKey,
     puk:RsaPublicKey,
     ps:T,
     sign_verify_sha256:(SigningKey<Sha256>,VerifyingKey<Sha256>),
+    #[allow(dead_code)]
     sign_verify_sha384:(SigningKey<Sha384>,VerifyingKey<Sha384>),
+    #[allow(dead_code)]
     sign_verify_sha512:(SigningKey<Sha512>,VerifyingKey<Sha512>),
 }
 
@@ -37,9 +39,6 @@ impl<P:PaddingScheme+Copy> RsaEntity<P> {
 }
 
 impl<P:PaddingScheme+Copy> RsaEntity<P> {
-    pub fn public_key(&self)->RsaPublicKey{
-        self.puk.clone()
-    }
     //加密
     pub fn encrypt(&self,data: &[u8])->anyhow::Result<Vec<u8>>{
         let mut rng = rand::thread_rng();
@@ -60,5 +59,21 @@ impl<P:PaddingScheme+Copy> RsaEntity<P> {
     pub fn verify_sha256(&self,data:&[u8],sign:&[u8])->anyhow::Result<()>{
         let sign = Signature::try_from(sign)?;
         self.sign_verify_sha256.1.verify(data,&sign)?;Ok(())
+    }
+    //生成私有证书pem
+    //换行格式会根据系统自动变化
+    pub fn generate_private_pkcs1_pem(&self)->anyhow::Result<String>{
+        let buf = self.prk.to_pkcs1_pem(LineEnding::default())?;Ok(buf)
+    }
+    //生成共有证书pem
+    //换行格式会根据系统自动变化
+    pub fn write_public_pem(&self)->anyhow::Result<String>{
+        let buf = self.puk.to_pkcs1_pem(LineEnding::default())?;Ok(buf)
+    }
+    pub fn public_key(&self)->&RsaPublicKey{
+        &(self.puk)
+    }
+    pub fn private_key(&self)->&RsaPrivateKey{
+        &(self.prk)
     }
 }

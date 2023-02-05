@@ -140,7 +140,7 @@ impl ConfuseRule for ConfuseRuleDefault{
 mod test{
     use rsa::{RsaPrivateKey};
     use rsa::pkcs1::{EncodeRsaPublicKey, LineEnding};
-    use crate::algo::wdrsa::rand::{ConfuseRule, ConfuseRuleDefault, RuleRand, RuleRandBuilder};
+    use crate::algo::wdrsa::rand::{ConfuseRule, ConfuseRuleDefault, RuleRandBuilder};
 
     #[test]
     fn test_rule_rand(){

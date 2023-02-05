@@ -9,12 +9,11 @@ pub use rsa_entity_builder::RsaEntityBuilder;
 
 #[cfg(test)]
 mod test{
-    use rsa::pkcs1::pem::Base64Encoder;
     use rustc_serialize::hex::ToHex;
     use crate::algo::wdrsa::RsaEntityBuilder;
     #[test]
     fn encrypt_decrypt(){
-        let entity = RsaEntityBuilder::new("hello world", 2048).build_pkcs15().expect("rsa 证书生成失败");
+        let entity = RsaEntityBuilder::new("hello world").build_pkcs15().expect("rsa 证书生成失败");
 
         let data = "test data";
         let cipher = entity.encrypt(data.as_bytes()).expect("rsa 加密失败");
@@ -28,7 +27,7 @@ mod test{
 
     #[test]
     fn sign_verify(){
-        let entity = RsaEntityBuilder::new("hello world", 2048).build_pkcs15().expect("rsa 证书生成失败");
+        let entity = RsaEntityBuilder::new("hello world").build_pkcs15().expect("rsa 证书生成失败");
 
         let data = "test data";
         let cipher = entity.sign_sha256(data.as_bytes()).expect("rsa 签名失败");
