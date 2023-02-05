@@ -1,3 +1,7 @@
+extern crate core;
+
+mod algo;
+
 pub fn add(left: usize, right: usize) -> usize {
     left + right
 }
