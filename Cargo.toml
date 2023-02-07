@@ -19,3 +19,7 @@ rustc-serialize = "0.3.24"
 
 [profile.test]
 opt-level = 3
+
+#[lib]
+#name = "wd_passport"
+#crate-type = ["staticlib", "cdylib"]

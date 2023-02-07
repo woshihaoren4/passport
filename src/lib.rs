@@ -9,7 +9,6 @@ mod define;
 pub use algo::*;
 pub use app::PassportEntity;
 pub use chrono::Utc;
-
 pub use define::*;
 
 #[cfg(test)]
