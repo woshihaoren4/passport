@@ -13,7 +13,13 @@ pub use define::*;
 
 #[cfg(test)]
 mod test{
-    use crate::{format_public_pem, sign, verify};
+    use crate::{format_public_pem, init_passport, sign, verify};
+    #[test]
+    fn test_default_init_passport(){
+        let key = "hello world".as_bytes();
+        init_passport(key, 2048, "2022-01-02 00:00:00", "2023-01-02 00:00:00", 60 * 60 * 24 * 30).expect("passport entity init error");
+        println!("success");
+    }
 
     #[test]
     fn test_default_passport_show_public_pem(){
