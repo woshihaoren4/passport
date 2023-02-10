@@ -29,14 +29,14 @@ pub fn init_passport(key:&[u8],bit_size:usize,start:&str,end:&str,interval:u64)-
     Ok(())
 }
 
-pub fn sign(data:&[u8],timestamp_sec:i64)->anyhow::Result<Vec<u8>>{
+pub fn rsa_sha256_sign(data:&[u8], timestamp_sec:i64) ->anyhow::Result<Vec<u8>>{
     let rpp = match DEFAULT_PASSPORT.read(){
         Ok(o) => o,
         Err(e) => return anyhow::anyhow!("sign.read DEFAULT_PASSPORT error:{}",e.to_string()).err(),
     };
     rpp.sign_sha256(data,timestamp_sec)
 }
-pub fn verify(data:&[u8],sign:&[u8],timestamp_sec:i64)->anyhow::Result<()>{
+pub fn rsa_sha156_verify(data:&[u8], sign:&[u8], timestamp_sec:i64) ->anyhow::Result<()>{
     let rpp = match DEFAULT_PASSPORT.read(){
         Ok(o) => o,
         Err(e) => return anyhow::anyhow!("verify.read DEFAULT_PASSPORT error:{}",e.to_string()).err(),

@@ -4,6 +4,7 @@ mod algo;
 mod app;
 mod common;
 mod define;
+// mod libc;
 
 
 pub use algo::*;
@@ -13,7 +14,7 @@ pub use define::*;
 
 #[cfg(test)]
 mod test{
-    use crate::{format_public_pem, init_passport, sign, verify};
+    use crate::{format_public_pem, init_passport, rsa_sha256_sign, rsa_sha156_verify};
     #[test]
     fn test_default_init_passport(){
         let key = "hello world".as_bytes();
@@ -32,20 +33,20 @@ mod test{
     #[test]
     #[should_panic]
     fn test_default_passport_range_min(){
-        sign("hello world".as_bytes(),1).expect("< min timestamp");
+        rsa_sha256_sign("hello world".as_bytes(), 1).expect("< min timestamp");
     }
     #[test]
     #[should_panic]
     fn test_default_passport_range_max(){
-        sign("hello world".as_bytes(),5607792000).expect("> max timestamp");
+        rsa_sha256_sign("hello world".as_bytes(), 5607792000).expect("> max timestamp");
     }
 
     #[test]
     fn test_default_passport_sign_verify(){
         let data = "hello world";
         let timestamp = 1866248975;
-        let sign = sign(data.as_bytes(), timestamp).expect("sign error");
-        verify(data.as_bytes(),sign.as_slice(),timestamp).expect("verify error");
+        let sign = rsa_sha256_sign(data.as_bytes(), timestamp).expect("sign error");
+        rsa_sha156_verify(data.as_bytes(), sign.as_slice(), timestamp).expect("verify error");
         println!("test_default_passport_sign_verify  success");
     }
 }
