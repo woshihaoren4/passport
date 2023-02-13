@@ -1,19 +1,25 @@
 /// Point-Free
 
-pub trait PFOk<Err>{
+pub trait PFOk<Err> {
     #[inline]
-    fn ok(self)->Result<Self,Err> where Self: Sized{
+    fn ok(self) -> Result<Self, Err>
+    where
+        Self: Sized,
+    {
         Ok(self)
     }
 }
 
-impl<Err,T> PFOk<Err> for T {}
+impl<Err, T> PFOk<Err> for T {}
 
-pub trait PFErr<Ok>{
+pub trait PFErr<Ok> {
     #[inline]
-    fn err(self)->Result<Ok,Self> where Self: Sized{
+    fn err(self) -> Result<Ok, Self>
+    where
+        Self: Sized,
+    {
         Err(self)
     }
 }
 
-impl<Ok,T> PFErr<Ok> for T {}
+impl<Ok, T> PFErr<Ok> for T {}
