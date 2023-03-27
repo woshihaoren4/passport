@@ -51,10 +51,15 @@ pub extern "C" fn encrypt(data: *const c_char, timestamp: c_longlong, ciphertext
         };
         let len = result.len();
         let buf: &mut [u8] = &mut *(ciphertext as *const [u8] as *mut [u8]);
-        for (i, v) in result.iter().enumerate() {
-            buf[i] = *v;
+        let max = buf.len();
+        for i in 0..max {
+            if i >= len {
+                return len as c_int;
+            }
+            buf[i] = result[i]
         }
-        return len as c_int;
+
+        return max as c_int;
     }
 }
 

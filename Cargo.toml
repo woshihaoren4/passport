@@ -1,6 +1,6 @@
 [package]
 name = "wd_passport"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 authors = ["wangdong <1443965173@qq.com>"]
 license = "MIT/Apache-2.0"
@@ -20,6 +20,6 @@ rustc-serialize = "0.3.24"
 [profile.test]
 opt-level = 3
 
-#[lib]
-#name = "wd_passport"
-#crate-type = ["staticlib", "cdylib"]
+[lib]
+name = "wd_passport"
+crate-type = ["staticlib", "cdylib"]
