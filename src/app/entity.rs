@@ -57,6 +57,35 @@ impl PassportEntity {
         let ts = timestamp_sec - timestamp_sec % self.interval;
         self.certs.get(&ts)
     }
+
+    pub fn encrypt<D: AsRef<[u8]>>(
+        &self,
+        data: D,
+        timestamp_sec: i64,
+    ) -> anyhow::Result<Vec<u8>> {
+        let re = match self.get_rsa_entity(timestamp_sec) {
+            Some(s) => s,
+            None => {
+                return anyhow::anyhow!("timestamp[{}] Out of scope of verification", timestamp_sec)
+                    .err()
+            }
+        };
+        re.encrypt(data.as_ref())
+    }
+    pub fn decrypt<D: AsRef<[u8]>>(
+        &self,
+        data: D,
+        timestamp_sec: i64,
+    ) -> anyhow::Result<Vec<u8>> {
+        let re = match self.get_rsa_entity(timestamp_sec) {
+            Some(s) => s,
+            None => {
+                return anyhow::anyhow!("timestamp[{}] Out of scope of verification", timestamp_sec)
+                    .err()
+            }
+        };
+        re.decrypt(data.as_ref())
+    }
     pub fn sign_sha256<D: AsRef<[u8]>>(
         &self,
         data: D,
@@ -156,15 +185,32 @@ mod test {
             .expect("十年期证书生成失败");
 
         let data = "hello world";
-        let sign_raw = entity.sign_sha256(data, 1678377600).expect("签名错误");
+        let sign_raw = entity.sign_sha256(data, 1679919556).expect("签名错误");
         let sign = (&sign_raw).base64().expect("base64 编码错误");
         println!("签名字符串 base64编码：len:{} --->{}", sign.len(), sign);
         let result = (&sign).try_decode_base64().expect("签名base64解码失败");
         assert_eq!(sign_raw, result, "base64 编解码前后的数据不一致");
         entity
-            .verify_sha256(data.as_bytes(), result.as_slice(), 1678377600)
+            .verify_sha256(data.as_bytes(), result.as_slice(), 1679919556)
             .expect("rsa 签名验证失败");
         println!("success");
+    }
+
+    #[test]
+    fn test_encrypt_decrypt(){
+        let start = Utc::now();
+        let end = Utc
+            .datetime_from_str("2024-02-06 00:00:00", "%Y-%m-%d %H:%M:%S")
+            .expect("截止时间生成错误");
+        let interval = Duration::from_secs(60 * 60 * 24 * 30);
+        let entity = PassportEntity::new("hello world", (start, end), interval, 1024)
+            .expect("十年期证书生成失败");
+
+        let data = b"hello world";
+        let ciphertext = entity.encrypt(&data, 1679919556).expect("encrypt failed");
+        println!("decrypt--->{:?}",ciphertext);
+        let plaintext = entity.decrypt(ciphertext.as_slice(),1679919556).expect("decrypt failed");
+        assert_eq!(&data[..],plaintext.as_slice(),"test_encrypt_decrypt failed");
     }
 }
 

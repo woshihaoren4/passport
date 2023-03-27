@@ -40,6 +40,26 @@ pub fn init_passport(
     Ok(())
 }
 
+pub fn rsa_sha256_encrypt(data: &[u8], timestamp_sec: i64) -> anyhow::Result<Vec<u8>>{
+    let rpp = match DEFAULT_PASSPORT.read() {
+        Ok(o) => o,
+        Err(e) => {
+            return anyhow::anyhow!("encrypt.read DEFAULT_PASSPORT error:{}", e.to_string()).err()
+        }
+    };
+    rpp.encrypt(data, timestamp_sec)
+}
+
+pub fn rsa_sha256_decrypt(data: &[u8], timestamp_sec: i64) -> anyhow::Result<Vec<u8>>{
+    let rpp = match DEFAULT_PASSPORT.read() {
+        Ok(o) => o,
+        Err(e) => {
+            return anyhow::anyhow!("decrypt.read DEFAULT_PASSPORT error:{}", e.to_string()).err()
+        }
+    };
+    rpp.decrypt(data, timestamp_sec)
+}
+
 pub fn rsa_sha256_sign(data: &[u8], timestamp_sec: i64) -> anyhow::Result<Vec<u8>> {
     let rpp = match DEFAULT_PASSPORT.read() {
         Ok(o) => o,
